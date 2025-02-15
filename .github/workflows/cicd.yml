@@ -114,7 +114,7 @@ jobs:
   
   Jfrog-docker-upload:
      runs-on: self-hosted
-     needs: docker-build-push-ACR  
+     needs:   Docker-build-push-ACR 
      steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -136,7 +136,7 @@ jobs:
 
   Trivy-Scan:
     runs-on: self-hosted
-    needs: docker-build-push-ACR
+    needs:   Docker-build-push-ACR
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -150,7 +150,7 @@ jobs:
     
   OWASP-Zap-Scan:
       runs-on: self-hosted
-      needs: docker-build-push-ACR
+      needs:   Docker-build-push-ACR
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -159,10 +159,10 @@ jobs:
           uses: zaproxy/action-baseline@v0.11.0
           with:
             target: 'https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/'  
-            rules_file_name: '.zap/rules.tsv'
+            #rules_file_name: '.zap/rules.tsv'
             allow_issue_writing: true
             fail_action: false  # Set to true if you want the workflow to fail on finding vulnerabilities
-            cmd_options: '-a'
+            cmd_options: '-a -timeout 600 -v'  # Increase timeout and add verbosity
   
         - name: Upload ZAP Report
           uses: actions/upload-artifact@v4
