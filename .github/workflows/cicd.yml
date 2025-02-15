@@ -180,7 +180,7 @@ jobs:
     steps:
       - name: Pull Docker image
         run: |
-          docker pull javaapplication.azurecr.io/java-app:${{ github.sha }}
+          docker pull javaapplication.azurecr.io/java-app:latest
   
       - name: Run ZAP scan on deployed app
         run: |
