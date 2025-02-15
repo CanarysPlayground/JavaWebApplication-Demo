@@ -76,7 +76,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t javaapplication.azurecr.io/java-app:${{ github.sha }} .
+          sudo docker build -t javaapplication.azurecr.io/java-app:${{ github.sha }} .
       
       - name: Push Docker image
         run: |
