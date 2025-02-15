@@ -188,13 +188,12 @@ jobs:
           docker run -d --name owasp-zap -u zap --rm \
             -p 8080:8080 \
             -v /tmp/.X11-unix:/tmp/.X11-unix \
-            owasp/zap2docker-stable:latest zap-baseline.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/  # Run baseline scan
-
+            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/  # Run baseline scan
+  
       - name: Run OWASP ZAP Baseline scan
         run: |
           # Assuming your application is running on localhost and port 8080
           docker exec owasp-zap zap-baseline.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/  # Replace URL if different
-          
       - name: Stop OWASP ZAP container
         run: |
           docker stop owasp-zap
