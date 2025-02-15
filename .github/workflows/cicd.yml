@@ -188,10 +188,10 @@ jobs:
             sudo falco -r /etc/falco/falco_rules.yaml > /tmp/falco_output.log 2>&1 &
             sleep 5  # Give it some time to initialize
     
-        # Optional: Tail the Falco output log for 10 seconds to monitor Falco's activity
-        - name: Tail Falco Log Output
-          run: |
-            tail -n 100 -f /tmp/falco_output.log
+        # # Optional: Tail the Falco output log for 10 seconds to monitor Falco's activity
+        # - name: Tail Falco Log Output
+        #   run: |
+        #     tail -n 100 -f /tmp/falco_output.log
   
         - name: Upload Falco logs
           uses: actions/upload-artifact@v4
