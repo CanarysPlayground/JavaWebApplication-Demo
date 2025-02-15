@@ -2,6 +2,10 @@ name: Build a war file for my Java Webapp
 on:
   push:
     branches: ["main"]
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   Build:
     runs-on: self-hosted
@@ -181,7 +185,10 @@ jobs:
         needs: Build
     
         steps:
-          - uses: actions/checkout@v4
+          - name: Checkout code
+            uses: actions/checkout@v4
+            env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
           - uses: actions/setup-java@v4
             with:
