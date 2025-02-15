@@ -159,7 +159,7 @@ jobs:
         #     unzip dependency-check.zip
         - name: Run Dependency Check
           run: |
-            ./dependency-check/bin/dependency-check.sh --out report.html --scan . --noupdate --disableAssemblyAnalyzer
+            ./dependency-check/bin/dependency-check.sh --out report.html --scan . --noupdate
             rm -rf dependency-check*
   
         - name: Upload Artifacts
@@ -167,3 +167,31 @@ jobs:
           with:
             name: artifacts
             path: report.html
+
+
+    falco-scan:
+      runs-on: self-hosted  # Use self-hosted runner for better performance, or choose a GitHub-hosted runner
+      
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+        # Step 2: Install Falco
+        - name: Install Falco
+          run: |
+            curl -s https://falco.org/install.sh | sudo bash  # Install Falco on the runner
+  
+        - name: Run Falco scan
+          run: |
+            sudo falco -o /tmp/falco_output.log &  # Start Falco in the background
+            sleep 10  # Allow some time for Falco to initialize
+            tail -f /tmp/falco_output.log  # Tail the log to monitor Falco's output
+  
+        - name: Upload Falco logs
+          uses: actions/upload-artifact@v4
+          with:
+            name: falco-logs
+            path: /tmp/falco_output.log
+
