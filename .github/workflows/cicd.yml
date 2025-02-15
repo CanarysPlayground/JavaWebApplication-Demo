@@ -183,18 +183,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TO }}
 
-      - name: Set up OWASP ZAP Docker container
+
+      - name: Run ZAP scan on deployed app
         run: |
-          docker run -d --name owasp-zap -u zap --rm \
-            -p 8080:8080 \
-            -v /tmp/.X11-unix:/tmp/.X11-unix \
-            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/  # Run baseline scan
+          # Run ZAP scan directly on the deployed URL
+          docker run -d --name owasp-zap -u zap --rm -p 8081:8080 owasp/zap2docker-stable:latest zap-full-scan.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/
   
-      - name: Run OWASP ZAP Baseline scan
-        run: |
-          # Assuming your application is running on localhost and port 8080
-          docker exec owasp-zap zap-baseline.py -t https://test04-c4aheadtbucuagav.northeurope-01.azurewebsites.net/MyWebApp/  # Replace URL if different
-      - name: Stop OWASP ZAP container
+      - name: Stop ZAP container
         run: |
           docker stop owasp-zap
+
   
