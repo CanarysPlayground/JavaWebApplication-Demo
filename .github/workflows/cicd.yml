@@ -1,4 +1,4 @@
-name: Build a WAR file for my Java Webapp
+name: Build a war file for my Java Webapo
 on:
   push:
     branches: ["main"]
@@ -14,15 +14,44 @@ jobs:
         distribution: 'adopt'
         java-version: '11'
     - name: Build with Maven
-      run: mvn clean install -f MyWebApp/pom.xml
-    - name: sonar Scan
-      uses: sonarsource/sonarqube-scan-action@master
+      run: mvn clean install -f MyWebApp/pom.xml -X
+
+    - name: List files in target directory
+      run: ls -l target/ 
+   
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
       with:
-        projectBaseDir: .
-        args: >
-          -Dsonar.organization=my-org
-          -Dsonar.projectKey=MyWebApp-Sep
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}    
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+    - name: Upload Maven artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: web_application
+          path: MyWebApp.war
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            auth-type: 'SERVICE_PRINCIPAL'
+
+    - name: Get the latest WAR file
+      id: latest_war
+      run: |
+          # Find the most recent JAR file in the target directory
+          LATEST_WAR=$(ls -t target/*.war | head -n 1)
+          echo "LATEST_WAR=$LATEST_WAR" >> $GITHUB_ENV
+          # Print out the location to ensure it's found
+          echo "WAR file path: $LATEST_WAR"
+
+    - name: Upload the .war file to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+          app-name: test02
+          package: ${{ env.LATEST_WAR }}
+   
     
