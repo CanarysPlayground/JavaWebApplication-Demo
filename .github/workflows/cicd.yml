@@ -1,4 +1,4 @@
-name: Build a WAR file for my Java Webapp
+name: Build a war file for my Java Webapo
 on:
   push:
     branches: ["main"]
