@@ -51,7 +51,7 @@ jobs:
     - name: Upload the .war file to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-          app-name: Test03
+          app-name: Test04
           package: ${{ env.LATEST_WAR }}
    
     
