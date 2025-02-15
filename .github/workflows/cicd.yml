@@ -159,7 +159,7 @@ jobs:
             unzip dependency-check.zip
         - name: Run Dependency Check
           run: |
-            ./dependency-check/bin/dependency-check.sh --out report.html --scan . --noupdate
+            ./dependency-check/bin/dependency-check.sh --out report.html --scan . 
             rm -rf dependency-check*
   
         - name: Upload Artifacts
