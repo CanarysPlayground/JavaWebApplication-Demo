@@ -178,10 +178,10 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-        # Step 2: Install Falco
-        - name: Install Falco
-          run: |
-            curl -s https://falco.org/install.sh | sudo bash  # Install Falco on the runner
+        # # Step 2: Install Falco
+        # - name: Install Falco
+        #   run: |
+        #     curl -s https://falco.org/install.sh | sudo bash  # Install Falco on the runner
   
         - name: Run Falco scan
           run: |
