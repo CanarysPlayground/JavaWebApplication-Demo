@@ -3,175 +3,156 @@ on:
   push:
     branches: ["main"]
 jobs:
-  # build:
-  #   runs-on: self-hosted
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v3
-  #   - name: setup JDK 11
-  #     uses: actions/setup-java@v2
-  #     with:
-  #       distribution: 'adopt'
-  #       java-version: '11'
-  #   - name: Build with Maven
-  #     run: mvn clean install -f pom.xml
+  Build:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: setup JDK 11
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+    - name: Build with Maven
+      run: mvn clean install -f pom.xml
 
-  #   - name: List files in target directory
-  #     run: ls -l target/ 
+    - name: List files in target directory
+      run: ls -l target/ 
    
-  #   - name: Cache Maven dependencies
-  #     uses: actions/cache@v3
-  #     with:
-  #         path: ~/.m2/repository
-  #         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-maven-
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-  #   - name: Upload Maven artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #         name: web_application
-  #         path: MyWebApp.war
+    - name: Upload Maven artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: web_application
+          path: MyWebApp.war
 
-  #   - name: Login to Azure
-  #     uses: azure/login@v1
-  #     with:
-  #           creds: ${{ secrets.AZURE_CREDENTIALS }}
-  #           auth-type: 'SERVICE_PRINCIPAL'
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            auth-type: 'SERVICE_PRINCIPAL'
 
-  #   - name: Get the latest WAR file
-  #     id: latest_war
-  #     run: |
-  #         # Find the most recent JAR file in the target directory
-  #         LATEST_WAR=$(ls -t target/*.war | head -n 1)
-  #         echo "LATEST_WAR=$LATEST_WAR" >> $GITHUB_ENV
-  #         # Print out the location to ensure it's found
-  #         echo "WAR file path: $LATEST_WAR"
+    - name: Get the latest WAR file
+      id: latest_war
+      run: |
+          # Find the most recent JAR file in the target directory
+          LATEST_WAR=$(ls -t target/*.war | head -n 1)
+          echo "LATEST_WAR=$LATEST_WAR" >> $GITHUB_ENV
+          # Print out the location to ensure it's found
+          echo "WAR file path: $LATEST_WAR"
 
-  #   - name: Upload the .war file to Azure Web App
-  #     uses: azure/webapps-deploy@v2
-  #     with:
-  #         app-name: Test04
-  #         package: ${{ env.LATEST_WAR }}
+    - name: Upload the .war file to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+          app-name: Test04
+          package: ${{ env.LATEST_WAR }}
    
-  # Docker-build-push-ACR:
-  #   runs-on: self-hosted
-  #   needs: build  
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Docker-build-push-ACR:
+    runs-on: self-hosted
+    needs: Build  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Build with Maven
-  #       run: mvn clean install -f pom.xml
+      - name: Build with Maven
+        run: mvn clean install -f pom.xml
 
-  #     - name: Log in to ACR
-  #       uses: azure/docker-login@v1
-  #       with:
-  #         registry: javaapplication.azurecr.io
-  #         username: ${{ secrets.ACR_USERNAME }}  
-  #         password: ${{ secrets.ACR_PASSWORD }}  
+      - name: Log in to ACR
+        uses: azure/docker-login@v1
+        with:
+          registry: javaapplication.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}  
+          password: ${{ secrets.ACR_PASSWORD }}  
  
 
-  #     - name: Build Docker image
-  #       run: |
-  #         sudo docker build -t javaapplication.azurecr.io/java-app:${{ github.sha }} .
+      - name: Build Docker image
+        run: |
+          sudo docker build -t javaapplication.azurecr.io/java-app:${{ github.sha }} .
       
-  #     - name: Push Docker image
-  #       run: |
-  #         sudo docker push javaapplication.azurecr.io/java-app:${{ github.sha }}
+      - name: Push Docker image
+        run: |
+          sudo docker push javaapplication.azurecr.io/java-app:${{ github.sha }}
 
-  # SonarCloud-Scan:
-  #   runs-on: self-hosted
-  #   needs: build  
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SonarCloud-Scan:
+    runs-on: self-hosted
+    needs: Build  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: setup JDK 17
-  #       uses: actions/setup-java@v2
-  #       with:
-  #         distribution: 'adopt'
-  #         java-version: '17'
+      - name: setup JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
 
-  #     - name: Print Java version
-  #       run: java -version
+      - name: Print Java version
+        run: java -version
 
-  #     - name: Build with Maven - Sonar
-  #       run: |
-  #           mvn -B verify sonar:sonar \
-  #             -Dsonar.projectKey=javaapplication-test_javatestapplication \
-  #             -Dsonar.organization=javaapplication-test \
-  #             -Dsonar.host.url=https://sonarcloud.io \
-  #             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-  #             -Dsonar.branch.name=master
-  #       env:
-  #           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #           GIT_HUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+      - name: Build with Maven - Sonar
+        run: |
+            mvn -B verify sonar:sonar \
+              -Dsonar.projectKey=javaapplication-test_javatestapplication \
+              -Dsonar.organization=javaapplication-test \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+              -Dsonar.branch.name=master
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            GIT_HUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
   
-  # Jfrog-docker-upload:
-  #    runs-on: self-hosted
-  #    needs:   Docker-build-push-ACR 
-  #    steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: Log in to JFrog Artifactory Docker registry
-  #       run: |
-  #         echo ${{ secrets.JFROG_API_KEY }} | docker login ${{secrets.JFROGREGISTRY}} -u ${{ secrets.JFROG_USERNAME }} --password-stdin
-  #     - name: Build with Maven
-  #       run: mvn clean install -f pom.xml
+  Jfrog-Docker-Upload:
+     runs-on: self-hosted
+     needs:   Docker-build-push-ACR 
+     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to JFrog Artifactory Docker registry
+        run: |
+          echo ${{ secrets.JFROG_API_KEY }} | docker login ${{secrets.JFROGREGISTRY}} -u ${{ secrets.JFROG_USERNAME }} --password-stdin
+      - name: Build with Maven
+        run: mvn clean install -f pom.xml
   
-  #     - name: Build Docker image
-  #       run: |
-  #         sudo docker build -t ${{secrets.JFROGREGISTRY}}/jfrogjava-docker-local/java-app:${{ github.sha }} .
+      - name: Build Docker image
+        run: |
+          sudo docker build -t ${{secrets.JFROGREGISTRY}}/jfrogjava-docker-local/java-app:${{ github.sha }} .
 
-  #     - name: Push Docker image to JFrog Artifactory
-  #       run: |
-  #         docker push trialkqod4y.jfrog.io/jfrogjava-docker-local/java-app:${{ github.sha }}
+      - name: Push Docker image to JFrog Artifactory
+        run: |
+          docker push trialkqod4y.jfrog.io/jfrogjava-docker-local/java-app:${{ github.sha }}
 
-  # Trivy-Scan:
-  #   runs-on: self-hosted
-  #   needs:   Docker-build-push-ACR
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Trivy-Scan:
+    runs-on: self-hosted
+    needs:   Docker-build-push-ACR
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
-  #     - name: Scan Docker image with Trivy
-  #       run: |
-  #         docker pull javaapplication.azurecr.io/java-app:${{ github.sha }}
-  #         trivy image --severity HIGH,CRITICAL javaapplication.azurecr.io/java-app:${{ github.sha }}
+      - name: Scan Docker image with Trivy
+        run: |
+          docker pull javaapplication.azurecr.io/java-app:${{ github.sha }}
+          trivy image --severity HIGH,CRITICAL javaapplication.azurecr.io/java-app:${{ github.sha }}
     
-    OWASP-Dependency-Check:
-      name: Dependency-Check
+     
+
+  Falco-Scan:
       runs-on: self-hosted
-      steps: 
-        - name: Download OWASP Dependency Check
-          run: |
-            VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
-            curl -sL "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-            unzip dependency-check.zip
-        - name: Run Dependency Check
-          run: |
-            ./dependency-check/bin/dependency-check.sh --out report.html --scan . 
-            rm -rf dependency-check*
-  
-        - name: Upload Artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: artifacts
-            path: report.html
-
-
-    falco-scan:
-      runs-on: self-hosted  # Use self-hosted runner for better performance, or choose a GitHub-hosted runner
-      
+      needs: Build
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -195,10 +176,4 @@ jobs:
             name: falco-logs
             path: /tmp/falco_output.log
 
-        - name: Run Snyk to check for vulnerabilities
-          uses: snyk/actions/maven@master
-          env:
-           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          with:
-           args: --severity-threshold=high
 
