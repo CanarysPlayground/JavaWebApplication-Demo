@@ -4,212 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Global Styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #333;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
             color: #fff;
-            padding: 20px;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
             text-align: center;
+            padding: 100px 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #444;
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
         }
-
-        nav a {
-            color: #fff;
-            padding: 14px 20px;
-            text-decoration: none;
-            text-align: center;
-            flex: 1;
+        .header p {
+            font-size: 1.5em;
         }
-
-        nav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .carousel {
-            position: relative;
-            max-width: 100%;
-            margin: 20px auto;
-            overflow: hidden;
-        }
-
-        .carousel-images {
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-
-        .carousel-images img {
-            width: 100%;
-            height: auto;
-        }
-
-        .section {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .cards {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
         .card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 200px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-        }
-
-        .card img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .card h3 {
-            margin: 10px 0;
-        }
-
-        .card p {
-            color: #555;
-        }
-
-        .feedback-form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 50%;
-            margin: 20px auto;
-        }
-
-        .feedback-form input,
-        .feedback-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .feedback-form button {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
         }
-
-        .feedback-form button:hover {
-            background-color: #444;
+        .card:hover {
+            transform: scale(1.05);
         }
-
-        footer {
+        .footer {
+            background-color: rgba(0, 0, 0, 0.8);
             text-align: center;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
+            padding: 20px;
             position: fixed;
             width: 100%;
             bottom: 0;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-            }
-
-            .cards {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .card {
-                width: 80%;
-            }
-
-            .feedback-form {
-                width: 80%;
-            }
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Our Hotel</h1>
-    </header>
-    <nav>
-        <a href="#home">Home</a>
-        <a href="#rooms">Rooms</a>
-        <a href="#services">Services</a>
-        <a href="#feedback">Feedback</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <div class="carousel" id="carousel">
-        <div class="carousel-images">
-            <img src="image1.jpg" alt="Hotel Image 1">
-            <img src="image2.jpg" alt="Hotel Image 2">
-            <img src="image3.jpg" alt="Hotel Image 3">
-        </div>
-    </div>
-    <div class="section" id="rooms">
-        <h2>Our Rooms</h2>
-        <div class="cards">
-            <div class="card">
-                <img src="room1.jpg" alt="Room 1">
-                <h3>Deluxe Room</h3>
-                <p>Spacious room with king-size bed and ocean view.</p>
-            </div>
-            <div class="card">
-                <img src="room2.jpg" alt="Room 2">
-                <h3>Standard Room</h3>
-                <p>Comfortable room with queen-size bed and city view.</p>
-            </div>
-            <div class="card">
-                <img src="room3.jpg" alt="Room 3">
-                <h3>Suite</h3>
-                <p>Luxurious suite with separate living area and balcony.</p>
-            </div>
-        </div>
-    </div>
-    <div class="section" id="services">
-        <h2>Our Services</h2>
-        <p>We offer a range of services to make your stay comfortable.</p>
-    </div>
-    <div class="section" id="feedback">
-        <h2>Guest Feedback</h2>
-        <form class="feedback-form">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Your Email" required>
-            <textarea placeholder="Your Feedback" rows="4" required></textarea>
-            <button type="submit">Submit Feedback</button>
-        </form>
-    </div>
-    <footer>
-        <p>&copy; 2025 Our Hotel. All rights reserved.</p>
-    </footer>
 
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#">Hotel Management</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#home">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#rooms">Rooms</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#dining">Dining</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#facilities">Facilities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#contact">Contact</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<header class="header">
+    <h1>Welcome to Our Hotel</h1>
+    <p>Experience luxury and comfort</p>
+</header>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Deluxe Room</h5>
+                    <p class="card-text">Enjoy a luxurious stay in our deluxe rooms with all modern amenities.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Executive Suite</h5>
+                    <p class="card-text">Our executive suites offer a perfect blend of comfort and elegance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Fine Dining</h5>
+                    <p class="card-text">Savor delicious cuisines at our multi-cuisine restaurant.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Swimming Pool</h5>
+                    <p class="card-text">Relax and unwind at our state-of-the-art swimming pool.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Spa & Wellness</h5>
+                    <p class="card-text">Rejuvenate your senses with our spa and wellness services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2025 Hotel Management. All rights reserved.</p>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
