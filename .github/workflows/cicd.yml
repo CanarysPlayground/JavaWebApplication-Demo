@@ -148,7 +148,7 @@ jobs:
   #         docker pull javaapplication.azurecr.io/java-app:${{ github.sha }}
   #         trivy image --severity HIGH,CRITICAL javaapplication.azurecr.io/java-app:${{ github.sha }}
     
-    dependency-check:
+    OWASP-Dependency-Check:
       name: Dependency-Check
       runs-on: self-hosted
       steps: 
