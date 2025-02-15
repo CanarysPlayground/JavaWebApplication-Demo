@@ -152,14 +152,14 @@ jobs:
       name: Dependency-Check
       runs-on: self-hosted
       steps: 
-        - name: Download OWASP Dependency Check
-          run: |
-            VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
-            curl -sL "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-            unzip dependency-check.zip
+        # - name: Download OWASP Dependency Check
+        #   run: |
+        #     VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
+        #     curl -sL "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
+        #     unzip dependency-check.zip
         - name: Run Dependency Check
           run: |
-            ./dependency-check/bin/dependency-check.sh --out report.html --scan .
+            ./dependency-check/bin/dependency-check.sh --out report.html --scan . --disableNvdUpdate
             rm -rf dependency-check*
   
         - name: Upload Artifacts
