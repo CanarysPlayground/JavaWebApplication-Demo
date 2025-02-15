@@ -14,7 +14,7 @@ jobs:
         distribution: 'adopt'
         java-version: '11'
     - name: Build with Maven
-      run: mvn clean install -f MyWebApp/pom.xml -X
+      run: mvn clean install -f pom.xml
 
     - name: List files in target directory
       run: ls -l target/ 
@@ -51,7 +51,7 @@ jobs:
     - name: Upload the .war file to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-          app-name: test02
+          app-name: Test04
           package: ${{ env.LATEST_WAR }}
    
     
