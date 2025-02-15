@@ -195,3 +195,10 @@ jobs:
             name: falco-logs
             path: /tmp/falco_output.log
 
+        - name: Run Snyk to check for vulnerabilities
+          uses: snyk/actions/maven@master
+          env:
+           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          with:
+           args: --severity-threshold=high
+
