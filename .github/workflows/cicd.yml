@@ -183,11 +183,15 @@ jobs:
         #   run: |
         #     curl -s https://falco.org/install.sh | sudo bash  # Install Falco on the runner
   
-        - name: Run Falco scan
+        - name: Run Falco in Background
           run: |
-            sudo falco -o /tmp/falco_output.log &  # Start Falco in the background
-            sleep 10  # Allow some time for Falco to initialize
-            tail -f /tmp/falco_output.log  # Tail the log to monitor Falco's output
+            sudo falco -r /etc/falco/falco_rules.yaml > /tmp/falco_output.log 2>&1 &
+            sleep 5  # Give it some time to initialize
+    
+        # Optional: Tail the Falco output log for 10 seconds to monitor Falco's activity
+        - name: Tail Falco Log Output
+          run: |
+            tail -n 100 -f /tmp/falco_output.log
   
         - name: Upload Falco logs
           uses: actions/upload-artifact@v4
