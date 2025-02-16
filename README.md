@@ -106,10 +106,10 @@ You can reach out to me through the following platforms:
 Here are some of my certificates from GitHub:
 
 <div>
-<a href="https://www.credly.com/badges/0fcec575-6bd6-4047-8065-7e4b3a920331/public_url" target="_blank"><img src="https://images.credly.com/size/160x160/images/024d0122-724d-4c5a-bd83-cfe3c4b7a073/image.png" alt="Credly Badge"></a>
-<a href="https://www.credly.com/badges/f16ed8a4-0d07-4162-b2af-76378f1c42e4/public_url" target="_blank"><img src="https://images.credly.com/size/160x160/images/89efc3e7-842b-4790-b09b-9ea5efc71ec3/image.png" alt="Credly Badge"></a>
-<a href="https://www.credly.com/badges/e3b671c0-2e82-40ce-88c0-575662d8e16f/public_url" target="_blank"><img src="https://images.credly.com/size/160x160/images/c9ed294b-f8ac-48fa-a8c3-96dab1f110f2/image.png" alt="Credly Badge"></a>
-<a href="https://www.credly.com/badges/25718db3-7c2b-4dcd-a146-e01e8e06878e/public_url" target="_blank"><img src="https://images.credly.com/size/160x160/images/34880f37-8ec8-4542-a78a-73ba6647208e/image.png" alt="Credly Badge"></a>
-<a href="https://www.credly.com/badges/cb064ece-acd4-4c63-9702-175669c7b2db/public_url" target="_blank"><img src="https://images.credly.com/size/160x160/images/6b924fae-3cd7-4233-b012-97413c62c85d/blob" alt="Credly Badge"></a>
+<a href="https://www.credly.com/badges/0fcec575-6bd6-4047-8065-7e4b3a920331/public_url" target="_blank"><img src="https://images.credly.com/size/150x150/images/024d0122-724d-4c5a-bd83-cfe3c4b7a073/image.png" alt="Credly Badge"></a>
+<a href="https://www.credly.com/badges/f16ed8a4-0d07-4162-b2af-76378f1c42e4/public_url" target="_blank"><img src="https://images.credly.com/size/150x150/images/89efc3e7-842b-4790-b09b-9ea5efc71ec3/image.png" alt="Credly Badge"></a>
+<a href="https://www.credly.com/badges/e3b671c0-2e82-40ce-88c0-575662d8e16f/public_url" target="_blank"><img src="https://images.credly.com/size/150x150/images/c9ed294b-f8ac-48fa-a8c3-96dab1f110f2/image.png" alt="Credly Badge"></a>
+<a href="https://www.credly.com/badges/25718db3-7c2b-4dcd-a146-e01e8e06878e/public_url" target="_blank"><img src="https://images.credly.com/size/150x150/images/34880f37-8ec8-4542-a78a-73ba6647208e/image.png" alt="Credly Badge"></a>
+<a href="https://www.credly.com/badges/cb064ece-acd4-4c63-9702-175669c7b2db/public_url" target="_blank"><img src="https://images.credly.com/size/150x150/images/6b924fae-3cd7-4233-b012-97413c62c85d/blob" alt="Credly Badge"></a>
 </div>
 
