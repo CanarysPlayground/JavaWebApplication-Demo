@@ -133,11 +133,11 @@ jobs:
   
       - name: Build Docker image
         run: |
-          sudo docker build -t ${{secrets.JFROGREGISTRY}}/java22-app/java22-app:${{ github.sha }} .
+          sudo docker build -t trialzpr8i1.jfrog.io/javaapplication/java22-app:${{ github.sha }} .
 
       - name: Push Docker image to JFrog Artifactory
         run: |
-          docker push trialzpr8i1.jfrog.io/java22-app/java22-app:${{ github.sha }}
+          docker push trialzpr8i1.jfrog.io/javaapplication/java22-app:${{ github.sha }}
 
   Trivy-Scan:
     runs-on: self-hosted
