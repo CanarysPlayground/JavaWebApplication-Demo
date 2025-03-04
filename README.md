@@ -1,6 +1,6 @@
 # Simple Hotel Management Website
 
-**Developer**: Sourav
+**Developer**: Sourav Sarkar
 
 ![Hotel Management Website](https://github.com/user-attachments/assets/197f4e7b-e727-4068-840f-a5ba6a866dc7)
 
