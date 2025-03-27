@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
   analyze:
     name: Analyze (java-kotlin)
@@ -24,11 +25,28 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Ensures full history for better analysis
+
+    # Setup Java environment (adjust version to match your project)
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # Optional: Explicitly build if autobuild fails
+    - name: Build with Maven (optional)
+      if: matrix.build-mode == 'autobuild'
+      run: mvn compile --file pom.xml # Adjust for Gradle: gradle build
+      continue-on-error: true # Allows CodeQL to proceed even if build fails
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
