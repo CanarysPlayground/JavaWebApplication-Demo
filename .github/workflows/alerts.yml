@@ -10,9 +10,9 @@ jobs:
       - name: Run GitHub Advanced Security to CSV
         uses: advanced-security/ghas-to-csv@v3
         env:
-          GITHUB_PAT: ${{ secrets.PAT }}  # Ensure you have stored your PAT in the repository secrets
+          GITHUB_PAT: ${{ secrets.PAT }}  
       - name: Upload CSV
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ghas-data
           path: '*.csv'
