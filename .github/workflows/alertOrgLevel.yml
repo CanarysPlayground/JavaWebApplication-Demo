@@ -15,39 +15,87 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup GitHub CLI
+      - name: Setup GitHub CLI and jq
         run: |
           type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
           && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
           && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
           && sudo apt update \
-          && sudo apt install gh -y
+          && sudo apt install gh jq -y
 
       - name: Authenticate GitHub CLI
         run: echo "${{ secrets.PowerBI_PAT }}" | gh auth login --with-token
 
-      - name: Export Organization-Level Security Findings
+      - name: Export and Process Code Scanning Alerts
         run: |
-          # Create output directory
           mkdir -p ./org-security-export
 
-          # Export Code Scanning Alerts
+          # Fetch Code Scanning Alerts
           gh api -H "Accept: application/vnd.github+json" \
             "/orgs/${{ github.repository_owner }}/code-scanning/alerts" \
             --paginate > ./org-security-export/code_scanning_alerts.json
 
-          # Export Dependabot Alerts
+          # Process Code Scanning Alerts to CSV
+          jq -r '
+            [
+              "Repository",
+              "Alert Number", 
+              "Rule ID", 
+              "Rule Name", 
+              "Severity", 
+              "State", 
+              "URL"
+            ] | @csv' \
+            ./org-security-export/code_scanning_alerts.json > ./org-security-export/code_scanning_alerts_headers.csv
+
+          jq -r '
+            .[] | [
+              .repository.full_name,
+              .number, 
+              .rule.id, 
+              .rule.description, 
+              .rule.severity, 
+              .state, 
+              .html_url
+            ] | @csv' \
+            ./org-security-export/code_scanning_alerts.json >> ./org-security-export/code_scanning_alerts_headers.csv
+
+      - name: Export and Process Dependabot Alerts
+        run: |
+          # Fetch Dependabot Alerts
           gh api -H "Accept: application/vnd.github+json" \
             "/orgs/${{ github.repository_owner }}/dependabot/alerts" \
             --paginate > ./org-security-export/dependabot_alerts.json
 
-          # Convert JSON to CSV using jq
-          jq -r '(.[0] | keys_unsorted) as $keys | $keys, map([.[$keys[]]])[] | @csv' \
-            ./org-security-export/code_scanning_alerts.json > ./org-security-export/code_scanning_alerts.csv
+          # Process Dependabot Alerts to CSV
+          jq -r '
+            [
+              "Repository",
+              "Package", 
+              "Ecosystem", 
+              "Severity", 
+              "Advisory", 
+              "Vulnerable Versions", 
+              "Patched Versions", 
+              "Fixed In", 
+              "URL"
+            ] | @csv' \
+            ./org-security-export/dependabot_alerts.json > ./org-security-export/dependabot_alerts_headers.csv
 
-          jq -r '(.[0] | keys_unsorted) as $keys | $keys, map([.[$keys[]]])[] | @csv' \
-            ./org-security-export/dependabot_alerts.json > ./org-security-export/dependabot_alerts.csv
+          jq -r '
+            .[] | [
+              .repository.full_name,
+              .dependency.name, 
+              .dependency.ecosystem, 
+              .severity, 
+              .advisory.summary, 
+              .vulnerable_version_range, 
+              .patched_versions // "N/A", 
+              .fixed_in // "N/A", 
+              .html_url
+            ] | @csv' \
+            ./org-security-export/dependabot_alerts.json >> ./org-security-export/dependabot_alerts_headers.csv
 
       - name: Upload Security Findings
         uses: actions/upload-artifact@v4
@@ -56,9 +104,9 @@ jobs:
           path: ./org-security-export/*.csv
           retention-days: 30
 
-      - name: Optional - Print Summary
+      - name: Print Summary
         run: |
           echo "Code Scanning Alerts:"
-          wc -l ./org-security-export/code_scanning_alerts.csv
+          wc -l ./org-security-export/code_scanning_alerts_headers.csv
           echo "Dependabot Alerts:"
-          wc -l ./org-security-export/dependabot_alerts.csv
+          wc -l ./org-security-export/dependabot_alerts_headers.csv
