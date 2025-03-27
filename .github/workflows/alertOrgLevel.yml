@@ -1,39 +1,82 @@
-name: Org-level GitHub Advanced Security Data to CSV
+name: Org-Level GHAS Data to CSV via API
 on:
-   push:
-
+  push:
 jobs:
   export-org-security-data:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: read
-      actions: read
-      contents: read
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Export GHAS Data for Organization
-        uses: advanced-security/ghas-to-csv@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          org-level: true  # Specify org-level export
-          output-path: ./ghas-org-export
+          python-version: '3.x'
 
-      - name: List generated CSV files
-        run: ls -l ./ghas-org-export/*.csv
+      - name: Install dependencies
+        run: pip install requests
 
-      - name: Upload CSV artifacts
+      - name: Fetch and Export GHAS Data
+        env:
+          GITHUB_PAT: ${{ secrets.PowerBI_PAT }}
+          ORG_NAME: "CanarysPlayground" 
+        run: |
+          python - <<EOF
+          import requests
+          import csv
+          import os
+
+          pat = os.getenv("GITHUB_PAT")
+          org = os.getenv("ORG_NAME")
+          headers = {"Authorization": f"token {pat}", "Accept": "application/vnd.github+json"}
+
+          # Fetch all repositories in the org
+          repos = []
+          page = 1
+          while True:
+              url = f"https://api.github.com/orgs/{org}/repos?per_page=100&page={page}"
+              response = requests.get(url, headers=headers)
+              if response.status_code != 200:
+                  print(f"Error fetching repos: {response.text}")
+                  break
+              data = response.json()
+              if not data:
+                  break
+              repos.extend([repo["name"] for repo in data])
+              page += 1
+
+          # Fetch Dependabot, Code Scanning, and Secret Scanning alerts
+          with open("ghas_data.csv", "w", newline="") as csvfile:
+              writer = csv.writer(csvfile)
+              writer.writerow(["Repository", "Type", "Alert Number", "State", "Details"])
+
+              for repo in repos:
+                  # Dependabot Alerts
+                  dep_url = f"https://api.github.com/repos/{org}/{repo}/dependabot/alerts"
+                  dep_response = requests.get(dep_url, headers=headers)
+                  if dep_response.status_code == 200:
+                      for alert in dep_response.json():
+                          writer.writerow([repo, "Dependabot", alert["number"], alert["state"], alert["dependency"]["package"]["name"]])
+
+                  # Code Scanning Alerts
+                  code_url = f"https://api.github.com/repos/{org}/{repo}/code-scanning/alerts"
+                  code_response = requests.get(code_url, headers=headers)
+                  if code_response.status_code == 200:
+                      for alert in code_response.json():
+                          writer.writerow([repo, "Code Scanning", alert["number"], alert["state"], alert["rule"]["id"]])
+
+                  # Secret Scanning Alerts
+                  secret_url = f"https://api.github.com/repos/{org}/{repo}/secret-scanning/alerts"
+                  secret_response = requests.get(secret_url, headers=headers)
+                  if secret_response.status_code == 200:
+                      for alert in secret_response.json():
+                          writer.writerow([repo, "Secret Scanning", alert["number"], alert["state"], alert["secret_type"]])
+
+          EOF
+
+      - name: Upload CSV
         uses: actions/upload-artifact@v4
         with:
-          name: org-ghas-security-data
-          path: ./ghas-org-export/*.csv
-          retention-days: 30
-
-      - name: Optional - Send CSV to external storage
-        # Uncomment and configure as needed for additional storage/reporting
-        # uses: your-preferred-storage-action@v1
-        # with:
-        #   files: ./ghas-org-export/*.csv
+          name: org-ghas-data
+          path: "ghas_data.csv"
+          if-no-files-found: warn
