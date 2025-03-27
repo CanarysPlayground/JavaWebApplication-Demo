@@ -1,24 +1,39 @@
-name: Export GitHub Advanced Security Data for Organization to CSV
+name: Org-level GitHub Advanced Security Data to CSV
 on:
-  push: 
+   push:
+
 jobs:
   export-org-security-data:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2 
+    permissions:
+      security-events: read
+      actions: read
+      contents: read
 
-      - name: Run GitHub Advanced Security to CSV for Organization
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Export GHAS Data for Organization
         uses: advanced-security/ghas-to-csv@v3
         env:
-          GITHUB_PAT: ${{ secrets.PAT }} 
-          GITHUB_REPORT_SCOPE: "organization" 
-          SCOPE_NAME: "CanarysPlayground" 
-          FEATURES: "secretscanning,codescanning,dependabot" 
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          org-level: true  # Specify org-level export
+          output-path: ./ghas-org-export
 
-      - name: Upload CSV
+      - name: List generated CSV files
+        run: ls -l ./ghas-org-export/*.csv
+
+      - name: Upload CSV artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: org-ghas-data 
-          path: "*.csv" 
-          if-no-files-found: warn 
+          name: org-ghas-security-data
+          path: ./ghas-org-export/*.csv
+          retention-days: 30
+
+      - name: Optional - Send CSV to external storage
+        # Uncomment and configure as needed for additional storage/reporting
+        # uses: your-preferred-storage-action@v1
+        # with:
+        #   files: ./ghas-org-export/*.csv
