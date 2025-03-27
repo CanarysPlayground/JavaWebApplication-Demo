@@ -1,82 +1,64 @@
-name: Org-Level GHAS Data to CSV via API
+name: Organization-Level Security Findings
+
 on:
   push:
+
 jobs:
   export-org-security-data:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: read
+      actions: read
+      contents: read
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Fetch and Export GHAS Data
-        env:
-          GITHUB_PAT: ${{ secrets.PowerBI_PAT }}
-          ORG_NAME: "CanarysPlayground" 
+      - name: Setup GitHub CLI
         run: |
-          python - <<EOF
-          import requests
-          import csv
-          import os
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
 
-          pat = os.getenv("GITHUB_PAT")
-          org = os.getenv("ORG_NAME")
-          headers = {"Authorization": f"token {pat}", "Accept": "application/vnd.github+json"}
+      - name: Authenticate GitHub CLI
+        run: echo "${{ secrets.PowerBI_PAT }}" | gh auth login --with-token
 
-          # Fetch all repositories in the org
-          repos = []
-          page = 1
-          while True:
-              url = f"https://api.github.com/orgs/{org}/repos?per_page=100&page={page}"
-              response = requests.get(url, headers=headers)
-              if response.status_code != 200:
-                  print(f"Error fetching repos: {response.text}")
-                  break
-              data = response.json()
-              if not data:
-                  break
-              repos.extend([repo["name"] for repo in data])
-              page += 1
+      - name: Export Organization-Level Security Findings
+        run: |
+          # Create output directory
+          mkdir -p ./org-security-export
 
-          # Fetch Dependabot, Code Scanning, and Secret Scanning alerts
-          with open("ghas_data.csv", "w", newline="") as csvfile:
-              writer = csv.writer(csvfile)
-              writer.writerow(["Repository", "Type", "Alert Number", "State", "Details"])
+          # Export Code Scanning Alerts
+          gh api -H "Accept: application/vnd.github+json" \
+            "/orgs/${{ github.repository_owner }}/code-scanning/alerts" \
+            --paginate > ./org-security-export/code_scanning_alerts.json
 
-              for repo in repos:
-                  # Dependabot Alerts
-                  dep_url = f"https://api.github.com/repos/{org}/{repo}/dependabot/alerts"
-                  dep_response = requests.get(dep_url, headers=headers)
-                  if dep_response.status_code == 200:
-                      for alert in dep_response.json():
-                          writer.writerow([repo, "Dependabot", alert["number"], alert["state"], alert["dependency"]["package"]["name"]])
+          # Export Dependabot Alerts
+          gh api -H "Accept: application/vnd.github+json" \
+            "/orgs/${{ github.repository_owner }}/dependabot/alerts" \
+            --paginate > ./org-security-export/dependabot_alerts.json
 
-                  # Code Scanning Alerts
-                  code_url = f"https://api.github.com/repos/{org}/{repo}/code-scanning/alerts"
-                  code_response = requests.get(code_url, headers=headers)
-                  if code_response.status_code == 200:
-                      for alert in code_response.json():
-                          writer.writerow([repo, "Code Scanning", alert["number"], alert["state"], alert["rule"]["id"]])
+          # Convert JSON to CSV using jq
+          jq -r '(.[0] | keys_unsorted) as $keys | $keys, map([.[$keys[]]])[] | @csv' \
+            ./org-security-export/code_scanning_alerts.json > ./org-security-export/code_scanning_alerts.csv
 
-                  # Secret Scanning Alerts
-                  secret_url = f"https://api.github.com/repos/{org}/{repo}/secret-scanning/alerts"
-                  secret_response = requests.get(secret_url, headers=headers)
-                  if secret_response.status_code == 200:
-                      for alert in secret_response.json():
-                          writer.writerow([repo, "Secret Scanning", alert["number"], alert["state"], alert["secret_type"]])
+          jq -r '(.[0] | keys_unsorted) as $keys | $keys, map([.[$keys[]]])[] | @csv' \
+            ./org-security-export/dependabot_alerts.json > ./org-security-export/dependabot_alerts.csv
 
-          EOF
-
-      - name: Upload CSV
+      - name: Upload Security Findings
         uses: actions/upload-artifact@v4
         with:
-          name: org-ghas-data
-          path: "ghas_data.csv"
-          if-no-files-found: warn
+          name: org-security-findings
+          path: ./org-security-export/*.csv
+          retention-days: 30
+
+      - name: Optional - Print Summary
+        run: |
+          echo "Code Scanning Alerts:"
+          wc -l ./org-security-export/code_scanning_alerts.csv
+          echo "Dependabot Alerts:"
+          wc -l ./org-security-export/dependabot_alerts.csv
